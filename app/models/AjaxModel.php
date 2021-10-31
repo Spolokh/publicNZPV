@@ -68,8 +68,8 @@ class AjaxModel extends Model
 		}
 
 		if ( !empty($phone) and !preg_match('/^(\s*)?(\+)?([- _():=+]?\d[- _():=+]?){10,14}(\s*)?$/', $phone) )
-        {
-            $this->errors[] = 'Укажите корректный телефон.';
+		{
+			$this->errors[] = 'Укажите корректный телефон.';
 		}
 
 		if ( empty($message) )
