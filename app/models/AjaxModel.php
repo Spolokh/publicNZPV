@@ -9,8 +9,8 @@
  */
 
 use Upload\Upload;
-use Mailer\{PHPMailer, 
-			Exception};
+use Mailer\PHPMailer;
+use Mailer\Exception;
 
 class AjaxModel extends Model
 {
@@ -34,7 +34,7 @@ class AjaxModel extends Model
 		$this->mailto = Config::get('admin_mail');
 		$this->header = $_SERVER['HTTP_X_REQUESTED_WITH'];
 		
-		if ( !isset($this->action) or !$this->isAjax() )
+		if ( !isset($this->action, $this->isAjax()) )
 		{
 			$this->_response_code( 500, 'not xmlhttprequest' );
 		}
@@ -294,6 +294,6 @@ class AjaxModel extends Model
 
 	private function isAjax() : bool
 	{
-		return ( !isset($this->header) or strtolower($this->header) !== 'xmlhttprequest') ? false : true;
+		return ( isset($this->header) or strtolower($this->header) == 'xmlhttprequest') ? true : null;
 	}
 }
