@@ -1,23 +1,16 @@
 <?php
 
-/*
- * @package RS-MINI
- * @copyright (c) 2015 Alexey Glumov aka Rio-Shaman (support@rio-shaman.ru)
- * @license GNU General Public License version 2; see LICENSE.txt
- *
- */
-
 defined('rootpath') or die;
 
 class Request
 {
     /*
      * хранит значение полученное методами 
-     * getHttpPost(), 
-     * getHttpGet(), 
-     * getHttpReq(), 
-     * getHttpFiles(), 
-     * getHttpCookie()
+     * Post(), 
+     * Get(), 
+     * Req(), 
+     * Files(), 
+     * Cookie()
      *
      * @var    - string
      * @access - private
@@ -166,7 +159,7 @@ class Request
     
     public function toFloat()
     {
-        return (float) $this->data;
+        return  $this->data? filter_var($this->data, FILTER_SANITIZE_NUMBER_FLOAT): NULL;
     }
 
     public function toUri()
