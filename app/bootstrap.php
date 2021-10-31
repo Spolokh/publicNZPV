@@ -11,6 +11,11 @@ define('MODEL_PATH', rootpath.'/models');
 define('CONTR_PATH', rootpath.'/controllers');
 define('MINIMUM_PHP', '7.0.33');
 
+if ( version_compare(PHP_VERSION, MINIMUM_PHP, '<') )
+{
+    exit('Your host needs to use PHP ' .MINIMUM_PHP. ' or higher to run this version CMS! This version ' . PHP_VERSION);
+}
+
 require_once 'core/view.php';
 require_once 'core/model.php';
 require_once 'core/controller.php';
