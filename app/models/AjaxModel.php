@@ -22,8 +22,9 @@ class AjaxModel extends Model
 	private $header;
 	private $mailto;
 	private $result;
-	private $errors = [];
-	private $charset = 'utf-8';
+	private $errors;
+	private $request;
+	private $charset;
 
 	public function __construct()
 	{
