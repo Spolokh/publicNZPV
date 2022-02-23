@@ -9,20 +9,20 @@ namespace traits;
 
 trait Users
 {
-    public function getUser($key = 'userid') : int
+	public function getUser($key = 'userid') : int
 	{
 		return \Session::get($key);
-    }
+	}
 
 	public function getLogin($key = 'username') : string
 	{
 		return \Session::get($key);
-    }
+	}
 
 	public function getGroup($key = 'usergroup') : int
 	{
 		return \Session::get($key);
-    }
+	}
 
 	public function isAuth() : bool
 	{
