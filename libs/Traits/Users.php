@@ -29,12 +29,6 @@ trait Users
 		return \Session::has('isauth');
 	}
 
-	public function getAvatar($ext = '.jpg') : string
-	{
-		$login = $this->getLogin();
-		return file_exists(root .'/img/' . $login . $ext) ? $login . $ext : 'default.png';
-    }
-
 	/**
 	 * Generate a random string, using a cryptographically secure 
 	 * pseudorandom number generator (random_int)
