@@ -10,7 +10,7 @@ class AjaxController extends Controller
 
 	public function index()
 	{
-		echo 'AjaxController';
+		echo __CLASS__;
 	}
 
 	public function registration()
@@ -25,12 +25,17 @@ class AjaxController extends Controller
 
 	public function delbook() 
 	{
-		$this->model->deleteBook();
+		$this->model->delbook();
 	}
 
 	public function contact() 
 	{
 		$this->model->contact();
+	}
+
+	public function profile() 
+	{
+		$this->model->profile();
 	}
 }
  
