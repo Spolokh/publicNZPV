@@ -16,9 +16,9 @@ class UsersModel extends Model
 		$offset = $_GET['skip'] ?? self::OFFSET;
 
 		return ORM::forTable('users')
-			->orderByAsc('id')
 			->limit (self::NUMBER)
-			->offset(self::OFFSET);
+			->offset(self::OFFSET)
+			->orderByAsc('id');
 	}
 
 	public function user()
@@ -51,11 +51,11 @@ class UsersModel extends Model
 		foreach ($query->findArray() AS $k => $row)
 		{
 			$json[] = [
-				'id'		=> $row['id'],
-				'mail'  	=> $row['mail'],
-				'date'  	=> date('d.m.Y@H:i:s', $row['date']),
+				'id'	=> $row['id'],
+				'mail' 	=> $row['mail'],
+				'date'  => $row['date'],
 				'username' 	=> $row['username'],
-				'avatar'	=> $row['avatar'] ? $row['username']. '.' .$row['avatar'] : 'default.png'
+				'avatar' => $row['avatar'] ? $row['username']. '.' .$row['avatar'] : 'default.png'
 			];
 		}
 		return json_encode($json);

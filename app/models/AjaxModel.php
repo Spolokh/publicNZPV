@@ -30,13 +30,14 @@ class AjaxModel extends Model
 	{
 		parent::__construct();
 
-		$this->action = $_POST['action'] ?? null;
-		$this->mailto = Config::get('admin_mail');
-		$this->header = $_SERVER['HTTP_X_REQUESTED_WITH'];
+		$this->action  = $_POST['action'] ?? null;
+		$this->header  = $_SERVER['HTTP_X_REQUESTED_WITH'];
+		$this->mailto  = Config::get('admin_mail');
+		$this->charset = Config::get('charset');
 		
-		if ( !isset($this->action, $this->isAjax()) )
+		if ( !isset($this->action) ) //   $this->isAjax() 'not xmlhttprequest'
 		{
-			$this->_response_code( 500, 'not xmlhttprequest' );
+			$this->_response_code( 500, 0 );
 		}
 	}
 
@@ -87,7 +88,7 @@ class AjaxModel extends Model
 
 		try {
 			$this->mailer->SetFrom ($mail, $name);
-			$this->mailer->CharSet = Config::get('charset');
+			$this->mailer->CharSet  = $this->charset;
 			$this->mailer->AddAddress($this->mailto, $subject);
 			$this->mailer->AddReplyTo($mail, $name);
 			$this->mailer->msgHTML('
@@ -106,7 +107,7 @@ class AjaxModel extends Model
 			$this->_response_code( 200, $this->result );
 			 
 		} catch ( Exception $e ) {
-			parent::logWrite('Ошибка: ' .$this->$mailer->ErrorInfo, true);
+			parent::logWrite('Ошибка: ' .$e, true);
 		}
 
 		$this->_response_code( 200, 0 );
@@ -156,7 +157,7 @@ class AjaxModel extends Model
 			if ($this->upload->uploaded)
 			{
 				$this->upload->file_new_name_body = uniqid('photo_');
-				$this->upload->file_max_size = 6291456; // 6 х 1024 х 1024
+				$this->upload->file_max_size = 6291456; // 6 x 1024 x 1024
 				$this->upload->image_ratio_crop = true;
 				$this->upload->forbidden = ['application/*'];
 				$this->upload->allowed   = ['image/jpeg', 'image/jpg', 'image/png']; 
@@ -175,15 +176,15 @@ class AjaxModel extends Model
 		$result->name = printf('%s %s', $name, $family);
 		$result->mail = $mail;
 		$result->icon = $icon ? $icon : 'default.png';
-		//$result->phone = $phone;
 		$result->save();
 
 		$query = ORM::forTable('books')->orderByDesc('id')->findArray();
+
 		//$id = $result->id();
-		//$query = 'SELECT * FROM `books` WHERE `id` =:id';
-		//$rows = ORM::forTable('books')
-		//	->query($query, ['id' => $id])
-		// 	->findArray();
+		//$query = "SELECT * FROM `users` WHERE `id` =:id";
+		//$query = ORM::forTable('users')
+		//	->rawQuery($query, ['id' => $result->id()])
+		//	->findArray();
 
 		foreach ($query as $row)
 		{
@@ -232,12 +233,12 @@ class AjaxModel extends Model
 			$this->errors[] = 'Ваш email уже кто-то использует!';
 		}
 
-		if (ORM::forTable('users')->select('username')->where(['username' => $username, 'mail' => $mail])->findMany())
+		if (ORM::forTable('users')->select('username')->where(['username' => $username])->findOne())
 		{
 			$this->errors[] = 'Ваш логин уже кто-то использует!';
 		}
 
-		if (reset($this->errors))
+		if ( reset($this->errors) )
 		{
 			$this->result = join ("\n", array_values($this->errors));
 			$this->_response_code(500, $this->result);
@@ -247,6 +248,7 @@ class AjaxModel extends Model
 		$user->username = $username;
 		$user->password = password_hash($password, PASSWORD_DEFAULT);
 		$user->date = time();
+		$user->name = $name;
 		$user->mail = $mail;
 		$user->save();
 
@@ -254,14 +256,14 @@ class AjaxModel extends Model
 		exit;
 	}
 	  
-	public function deleteBook()
+	public function delbook()
 	{
 		if( !$this->isAuthorize or $this->action !== 'delete' )
 		{
 			$this->_response_code( 500, 0 );
 		}
 
-		if (empty($_POST['item']))
+		if( empty($_POST['item']) )
 		{
 			$this->_response_code( 500, 'Вы никого не выбрали.' );
 		}
@@ -280,6 +282,55 @@ class AjaxModel extends Model
 		exit;
 	}
 
+	public function profile( array $values = [] )
+	{
+		if ( !$this->model->isAuth() or $this->action !== 'profile' )
+		{
+			$this->_response_code( 500, 0 );
+		}
+
+		foreach ($_POST as $k => $v) {
+			$$k = trim(htmlspecialchars($v));
+		}
+
+		if ( empty($userid) ) {
+			$this->_response_code( 500, 0 );
+		}
+
+		if ( !filter_var($mail, FILTER_VALIDATE_EMAIL) )
+		{ 
+			$this->errors[] = 'Введите вашу почту корректно!';
+		}
+
+		if (reset($this->errors))
+		{
+			$this->result = join ("\n", array_values($this->errors));
+			$this->_response_code(500, $this->result);
+		}
+
+		$values = [
+			'name' => $name,
+			'mail' => $mail
+		];
+
+		if ( !empty($password) and $password === $password2 )
+		{
+			$values['password'] = password_hash( $password, PASSWORD_DEFAULT );
+		}
+
+		try {
+			$query = ORM::forTable('users')->findOne($userid);
+			$query->set($values);
+			$query->save();
+
+			header('Location: /profile');
+			exit;
+
+		} catch(\Exception $e) {
+			$this->model->logWrite ($e->getMessage());
+		}
+	}
+
 	private function _response_code( int $code, $exit = NULL )
 	{
 		http_response_code($code) ;
@@ -294,6 +345,6 @@ class AjaxModel extends Model
 
 	private function isAjax() : bool
 	{
-		return ( isset($this->header) or strtolower($this->header) == 'xmlhttprequest') ? true : null;
+		return ( isset($this->header) or strtolower($this->header) == 'xmlhttprequest') ? true : false;
 	}
 }
