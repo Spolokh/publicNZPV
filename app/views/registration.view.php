@@ -11,22 +11,24 @@
           <form id="registration" action="/ajax/registration" method="POST">
               <div class="mb-3">
                 <input type="text" class="form-control" name="username" maxlength="16" pattern="[a-zA-Z0-9\-]{3,16}" placeholder="Логин: Латинские буквы, цифры, до 16 знаков" required />
-                
-                
 							</div>
+
               <div class="mb-3">
-                <input type="password" class="form-control" name="password" maxlength="16" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,16}" placeholder="Пароль: Разные регистры + цифры, не менее 6 знаков" required />
-                
-                
+                <input type="password" class="form-control" name="password" maxlength="16" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,16}" placeholder="Пароль: Разные регистры + цифры, не менее 6 знаков" required /> 
               </div>
+
               <div class="mb-3">
-							  <input type="password" class="form-control span4" name="password2" placeholder="Пароль (ещё раз)" required />
-                
+							  <input type="password" class="form-control span4" name="password2" placeholder="Пароль (ещё раз)" required />  
               </div>
+
+              <div class="mb-3">
+							  <input type="text" class="form-control span4" name="name" placeholder="Ваше Ф.И.О" required />  
+              </div>
+
               <div class="mb-3">
                 <input type="email" class="form-control span4" name="mail" placeholder="Ваша почта" required />
-              
               </div>
+
               <div class="mb-3">
                 <input name="sessid" type="hidden" value="<?=session_id() ?>" />
                 <input type="hidden" name="action" value="registration" />
