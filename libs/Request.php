@@ -58,7 +58,7 @@ class Request
      
     public function Post($name, $v = NULL)
     {
-        $this->data = $_POST[$name] ?? $v;
+        $this->data = isset($_POST[$name]) ? trim($_POST[$name]) : $v;
         return $this;
     }
     
@@ -73,7 +73,7 @@ class Request
     
     public function Get($name, $v = NULL)
     {
-        $this->data = $_GET[$name] ?? $v;
+        $this->data = isset($_GET[$name]) ? trim($_GET[$name]) : $v;
         return $this;
     }
     
@@ -88,7 +88,7 @@ class Request
     
     public function Req($name, $v = NULL)
     {
-        $this->data = $_REQUEST[$name] ?? $v;
+        $this->data = isset($_REQUEST[$name]) ? trim($_REQUEST[$name]) : $v;
         return $this;
     }
     
@@ -159,11 +159,16 @@ class Request
     
     public function toFloat()
     {
-        return  $this->data? filter_var($this->data, FILTER_SANITIZE_NUMBER_FLOAT): NULL;
+        return $this->data? filter_var($this->data, FILTER_SANITIZE_NUMBER_FLOAT): NULL;
     }
 
-    public function toUri()
+    public function toEmail()
     {
-        return  $this->data? filter_var($this->data, FILTER_SANITIZE_URL): NULL;
+        return $this->data? filter_var($this->data, FILTER_VALIDATE_EMAIL): NULL;
+    }
+
+    public function toUrl()
+    {
+        return $this->data? filter_var($this->data, FILTER_SANITIZE_URL): NULL;
     }
 }

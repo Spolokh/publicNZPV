@@ -34,9 +34,16 @@ class Config
     {
         self::$config[$param] = $value;
     }
+
+    /**
+     * @access - public
+     */
+    public static function has($param)
+    {
+       isset(self::$config[$param]);
+    }
     
-    /*
-     
+    /**
      * @access - public
      * @return - Ð½Ð°ÑÑ‚Ñ€Ð¾Ð¹ÐºÐ°
      *

@@ -1,193 +1,169 @@
 <?php
-
-/*
- * Класс для генерации постраничной навигации
- */
-
+ /**
+  *
+  * Этот класс помогает интегрировать разбиение на страницы в PHP.
+  *
+  */
 class Pagination
 {
-
-    /**
-     * 
-     * @var Ссылок навигации на страницу
-     * 
-     */
-    private $max = 10;
-
-    /**
-     * 
-     * @var Ключ для GET, в который пишется номер страницы
-     * 
-     */
-    private $index = 'page';
-
-    /**
-     * 
-     * @var Текущая страница
-     * 
-     */
-    private $current_page;
-
-    /**
-     * 
-     * @var Общее количество записей
-     * 
-     */
-    private $total;
-
-    /**
-     * 
-     * @var Записей на страницу
-     * 
-     */
-    private $limit;
-
-    /**
-     * Запуск необходимых данных для навигации
-     * @param integer $total - общее количество записей
-     * @param integer $limit - количество записей на страницу
-     * 
-     * @return
-     */
-    public function __construct($total, $currentPage = 0, $limit = 7, $index = 'page')
+    protected $baseURL  = '';
+    protected $total    = '';
+    protected $limit    = 10;
+    protected $numLinks     =  2;
+    protected $currentPage  =  0;
+    protected $firstLink    = 'Первая';
+    protected $lastLink     = 'Последняя';
+    protected $nextLink     = '<span class="fa fa-chevron-right" aria-hidden="true"></span>';
+    protected $prevLink     = '<span class="fa fa-chevron-left" aria-hidden="true"></span>';
+    protected $fullTagOpen  = '<ul class="pagination justify-content-center">';
+    protected $fullTagClose = '</ul>';
+    protected $firstTagOpen = '<li class="page-item">';
+    protected $firstTagClose= '</li>';
+    protected $lastTagOpen  = '<li class="page-item">';
+    protected $lastTagClose = '</li>';
+    protected $curTagOpen   = '<li class="page-item active">';
+    protected $curTagClose  = '</li>';
+    protected $nextTagOpen  = '<li class="page-item">';
+    protected $nextTagClose = '</li>';
+    protected $prevTagOpen  = '<li class="page-item">';
+    protected $prevTagClose = '</li>';
+    protected $numTagOpen   = '<li class="page-item">';
+    protected $numTagClose  = '</li>';
+    protected $showCount    = false;
+    protected $currentOffset= 0;
+    protected $queryStringSegment ='page';
+    
+    public function __construct( array $params = [] )
     {
-        # Устанавливаем общее количество записей
-        $this->total = $total;
-
-        # Устанавливаем количество записей на страницу
-        $this->limit = $limit;
-
-        # Устанавливаем ключ в url
-        $this->index = $index;
-
-        # Устанавливаем количество страниц
-        $this->amount = $this->amount();
-
-        # Устанавливаем номер текущей страницы
-        $this->setCurrentPage($currentPage);
+        if (count($params) > 0){
+            $this->initialize($params);        
+        }
     }
-
-    /**
-     *  Для вывода ссылок
-     * 
-     * @return HTML-код со ссылками навигации
-     */
-    public function get()
+     
+    private function initialize( array $params = [] )
     {
-        # Для записи ссылок
-        $links = null;
+        if (count($params) > 0){
+            foreach ($params as $k => $v){
+                if (isset($this->$k)){
+                    $this->$k = $v;
+                }
+            }        
+        }
+    }
+     
+    /**
+     * Генерируем ссылки на страницы
+    */    
+    public function createLinks()
+    { 
+        // Если общее количество записей 0, не продолжать
+        if ($this->total == 0 || $this->limit == 0){
+            return '';
+        }
 
-        # Получаем ограничения для цикла
-        $limits = $this->limits();
+        // Считаем общее количество страниц
+        $numPages = ceil($this->total / $this->limit);
+        
+        // Если страница только одна, не продолжать
+        if ($numPages == 1){
 
-        $html = '<ul class="pagination">';
-        # Генерируем ссылки
-        for ($page = $limits[0]; $page <= $limits[1]; $page++) {
-            # Если текущая это текущая страница, ссылки нет и добавляется класс active
-            if ($page == $this->current_page) {
-                $links .= '<li class="active"><a href="#">' .$page. '</a></li>';
+            if ($this->showCount) {
+                $info = 'Showing : ' . $this->total;
+                return $info;
             } else {
-                # Иначе генерируем ссылку
-                $links .= $this->generateHtml($page);
+                return '';
             }
         }
+         
+        // Определяем строку запроса
+        $query_string_sep = (strpos($this->baseURL, '?') === FALSE) ? '?page=' : '&amp;page=';
+        $this->baseURL = $this->baseURL.$query_string_sep;
+        
+        // Определяем текущую страницу
+        $this->currentPage = $_GET[$this->queryStringSegment];
+        
+        if ( !is_numeric($this->currentPage) || $this->currentPage == 0 ){
+            $this->currentPage = 1;
+        }
+        
+        // Строковая переменная вывода контента
+        $output = '';
+         
+        // Отображаем сообщение о ссылках на другие страницы
+        if ($this->showCount){
 
-        # Если ссылки создались
-        if (!is_null($links)) {
-            # Если текущая страница не первая
-            if ($this->current_page > 1)
-            # Создаём ссылку "На первую"
-                $links = $this->generateHtml(1, '&lt;') . $links;
-
-            # Если текущая страница не первая
-            if ($this->current_page < $this->amount)
-            # Создаём ссылку "На последнюю"
-                $links.= $this->generateHtml($this->amount, '&gt;');
+            $currentOffset = ($this->currentPage > 1) ? ($this->currentPage - 1) * $this->limit:$this->currentPage;
+            
+            $info = 'Показаны элементы с ' .$currentOffset. ' по ' ;
+            $info.= ( ($currentOffset + $this->limit) < $this->total ) ? ($this->currentPage * $this->limit) : $this->total;
+            $info.= ' из ' . $this->total;
+            
+            $output.= $info;
+        }
+         
+        $this->numLinks = (int) $this->numLinks;
+         
+        // Если номер страницы больше максимального значения, отображаем последнюю страницу
+        if( $this->currentPage > $this->total )
+        {
+            $this->currentPage = $numPages;
+        }
+         
+        $uriPageNum = $this->currentPage;
+        
+        // Рассчитываем первый и последний элементы 
+        $start = (($this->currentPage - $this->numLinks) > 0) ? $this->currentPage - ($this->numLinks - 1) : 1;
+        $stop  = (($this->currentPage + $this->numLinks) < $numPages) ? $this->currentPage + $this->numLinks : $numPages;
+        
+        // Выводим ссылку на первую страницу
+        if( $this->currentPage > $this->numLinks ){
+            $firstPageURL = str_replace($query_string_sep, '', $this->baseURL);
+            $output.= $this->firstTagOpen .'<a class="page-link" href="' .$firstPageURL. '">' .$this->firstLink. '</a>'.$this->firstTagClose;
         }
 
-        $html.= $links . '</ul>';
+        // Выводим ссылку на предыдущую страницу
+        if ($this->currentPage != 1)
+        {
+            $i = ($uriPageNum - 1);
+            
+            if( $i == 0 ) {
+                $i = '';
+            }
 
-        # Возвращаем html
-        return $html;
-    }
-
-    /**
-     * Для генерации HTML-кода ссылки
-     * @param integer $page - номер страницы
-     * 
-     * @return
-     */
-    private function generateHtml($page, $text = null)
-    {
-        # Если текст ссылки не указан
-        if (!$text)
-        # Указываем, что текст - цифра страницы
-            $text = $page;
-
-        $currentURI = rtrim($_SERVER['REQUEST_URI'], '/') . '/';
-        $currentURI = preg_replace('~/page-[0-9]+~', '', $currentURI);
-        # Формируем HTML код ссылки и возвращаем
-        return '<li><a href="' . $currentURI . $this->index . $page . '">' . $text . '</a></li>';
-    }
-
-    /**
-     *  Для получения, откуда стартовать
-     * 
-     * @return массив с началом и концом отсчёта
-     */
-    private function limits()
-    {
-        # Вычисляем ссылки слева (чтобы активная ссылка была посередине)
-        $left = $this->current_page - round($this->max / 2);
-
-        # Вычисляем начало отсчёта
-        $start = $left > 0 ? $left : 1;
-
-        # Если впереди есть как минимум $this->max страниц
-        if ($start + $this->max <= $this->amount)
-        # Назначаем конец цикла вперёд на $this->max страниц или просто на минимум
-            $end = $start > 1 ? $start + $this->max : $this->max;
-        else {
-            # Конец - общее количество страниц
-            $end = $this->amount;
-
-            # Начало - минус $this->max от конца
-            $start = $this->amount - $this->max > 0 ? $this->amount - $this->max : 1;
+            $output.= $this->prevTagOpen.'<a class="page-link" href="'.$this->baseURL.$i.'">'.$this->prevLink.'</a>'.$this->prevTagClose;
+        }
+        // Выводим цифровые ссылки
+        for($loop = $start -1; $loop <= $stop; $loop++){
+            $i = $loop;
+            if($i >= 1){
+                if( $this->currentPage == $loop ){
+                    $output.= $this->curTagOpen .'<a class="page-link">' .$loop. '</a>' .$this->curTagClose;
+                } else {
+                    $output.= $this->numTagOpen .'<a class="page-link" href="'.$this->baseURL.$i.'">'.$loop.'</a>' . $this->numTagClose;
+                }
+            }
+        }
+        // Выводим ссылку на следующую страницу
+        if( $this->currentPage < $numPages ){
+            $i = ($this->currentPage + 1);
+            $output.= $this->nextTagOpen.'<a class="page-link" href="'.$this->baseURL.$i.'">' .$this->nextLink. '</a>'.$this->nextTagClose;
+        }
+        // Выводим ссылку на последнюю страницу
+        if(($this->currentPage + $this->numLinks) < $numPages){
+            $i = $numPages;
+            $output.= $this->lastTagOpen.'<a class="page-link" href="'.$this->baseURL.$i.'">' .$this->lastLink. '</a>'.$this->lastTagClose;
         }
 
-        # Возвращаем
-        return
-                array($start, $end);
+        // Удаляем двойные косые
+        $output = preg_replace("#([^:])//+#", "\1/", $output);
+        // Добавляем открывающий и закрывающий тэги блока
+        $output = $this->fullTagOpen . $output . $this->fullTagClose;
+
+        return $output;        
     }
 
-    /**
-     * Для установки текущей страницы
-     * 
-     * @return
-     */
-    private function setCurrentPage($currentPage)
+    public function __toString()
     {
-        # Получаем номер страницы
-        $this->current_page = $currentPage;
-
-        # Если текущая страница боле нуля
-        if ($this->current_page > 0) {
-            # Если текунщая страница меньше общего количества страниц
-            if ($this->current_page > $this->amount)
-            # Устанавливаем страницу на последнюю
-                $this->current_page = $this->amount;
-        } else
-        # Устанавливаем страницу на первую
-            $this->current_page = 1;
-    }
-
-    /**
-     * Для получеия общего числа страниц
-     * 
-     * @return число страниц
-     */
-    private function amount()
-    {
-        return round($this->total / $this->limit);
+        return $this->createLinks() ;
     }
 }
