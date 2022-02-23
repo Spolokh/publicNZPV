@@ -23,9 +23,9 @@
 							<td><img src="/img/flags/24/<?=str_replace( ' ', '-', $row->countryName) ?>.png" alt="<?=$row->countryName ?>" /> <?=$row->countryName ?></a></td>
 							<td><?=$row->countryCode ?></td>
 							<td><?=$row->capital ?></td>
-							<th><input type="checkbox" name="" id="checked<?=$row->id ?>"/>
+							<td><input type="checkbox" name="" id="checked<?=$row->id ?>"/>
 								<label for="checked<?=$row->id ?>"></label>
-							</th>	
+							</td>	
 						</tr>
 					<?php endforeach; ?>
 					</tbody>
