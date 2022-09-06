@@ -30,8 +30,8 @@ class UsersModel extends Model
 	public function json( $json = [], $query = null ) 
 	{
 		$draw 	= $_GET['draw'];
-		$number = $_GET['start'];
-		$offset = $_GET['length'];
+		$offset = $_GET['start'] ?? 0;
+		$number = $_GET['length'] ?? 10;
 		$search = $_GET['search']['value'];
 		
 		$query = ORM::forTable(self::TABLE)->select(['id', 'username', 'mail', 'date', 'avatar']);
@@ -50,14 +50,19 @@ class UsersModel extends Model
 		
 		foreach ($query->findArray() AS $k => $row)
 		{
-			$json[] = [
-				'id'	=> $row['id'],
-				'mail' 	=> $row['mail'],
-				'date'  => $row['date'],
+			$data[] = [
+				'id'		=> $row['id'],
+				'mail' 		=> $row['mail'],
+				'date'  	=> $row['date'],
 				'username' 	=> $row['username'],
-				'avatar' => $row['avatar'] ? $row['username']. '.' .$row['avatar'] : 'default.png'
+				'avatar' 	=> $row['avatar'] ? $row['username']. '.' .$row['avatar'] : 'default.png'
 			];
 		}
-		return json_encode($json);
+		return json_encode([
+			'draw' => $draw,
+			'recordsTotal' => $total,
+			'recordsFiltered' => $total,
+			'data' => $data
+		]);
 	}
 }
