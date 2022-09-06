@@ -84,12 +84,11 @@
 					order: [[ 0, 'asc' ]]
 					, ordering: true
 					, processing: true
-					, ajax: {
-						url: '/users/json',
-						type: 'GET',
-						dataSrc: ''
-					}
-					, language: {	// https://cdn.datatables.net/plug-ins/a5734b29083/i18n/Russian.json
+					, serverSide: true
+					, pageLength: 10
+					, serverMethod: 'GET'
+					, ajax:  '/users/json'
+					, language: {
 						sUrl: '/js/i18n/ru.json'
 					}
 					, columns: [
