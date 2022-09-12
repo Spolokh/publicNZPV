@@ -28,37 +28,37 @@ class ProductsModel extends Model
 		$total = $query->count();
 
 		$query = $query
-      ->whereRaw('(`mark` LIKE ? OR `model` LIKE ? OR `generation` LIKE ? OR `year` LIKE ? OR `color` LIKE ? OR `transmission` LIKE ?)', [
-          $search.'%', $search.'%',  $search.'%', $search.'%', $search.'%', $search.'%'
-      ])
-      ->offset($offset)
-      ->limit ($number)
-      ->orderByAsc('id')
-      ->findArray()
+		      ->whereRaw('(`mark` LIKE ? OR `model` LIKE ? OR `generation` LIKE ? OR `year` LIKE ? OR `color` LIKE ? OR `transmission` LIKE ?)', [
+			  $search.'%', $search.'%',  $search.'%', $search.'%', $search.'%', $search.'%'
+		      ])
+		      ->offset($offset)
+		      ->limit ($number)
+		      ->orderByAsc('id')
+		      ->findArray()
 		;
 		
 		foreach ($query AS $k => $row)
 		{
 			$data[] = [
-        'id'   => $row['id'],
-        'mark' => $row['mark'],
-        'model' => $row['model'],
-        'generation' => $row['generation'],
-        'year' => $row['year'],
-        'run' => $row['run'],
-        'color' => $row['color'],
-        'body'  => $row['body-type'],
-        'engine' => $row['engine-type'],
-        'transmission' => $row['transmission'],
-        'gear' => $row['gear-type']
+				'id'   => $row['id'],
+				'mark' => $row['mark'],
+				'model' => $row['model'],
+				'generation' => $row['generation'],
+				'year' => $row['year'],
+				'run' => $row['run'],
+				'color' => $row['color'],
+				'body'  => $row['body-type'],
+				'engine' => $row['engine-type'],
+				'transmission' => $row['transmission'],
+				'gear' => $row['gear-type']
 			];
 		}
 
 		return json_encode([
 			'draw' => $draw,
-        'recordsTotal' => $total,
-        'recordsFiltered' => $total,
-        'data' => $data
+			'recordsTotal' => $total,
+			'recordsFiltered' => $total,
+			'data' => $data
 		]);
 	}
 }
