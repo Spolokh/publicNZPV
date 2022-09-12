@@ -8,6 +8,9 @@ define('DBUSER', 'root');
 define('DBPASS', '');
 define('DBHOST', 'localhost');
 
+$file = 'data.xml';
+file_exists($file) or die('Такого файла не существует');
+
 require_once 'libs/ORM.php';
 ORM::configure('mysql:host='.DBHOST.';dbname='.DBNAME);
 ORM::configure([
@@ -16,9 +19,6 @@ ORM::configure([
 ]);
 
 $db = ORM::getDb();
-
-$file = 'data.xml';
-file_exists($file) or die('Такого файла не существует');
 
 $file = simplexml_load_file($file);
 $data = $file->offers->offer;
