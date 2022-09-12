@@ -11,7 +11,7 @@ class UsersModel extends Model
 		parent:: __construct();
 	}
 	
-	public function query() // Здесь реальные данные.
+	public function count()
 	{
 		return ORM::forTable(self::TABLE)
 			->select(['id'])
@@ -20,7 +20,7 @@ class UsersModel extends Model
 
 	public function user()
 	{
-		return ORM::forTable('users');
+		return ORM::forTable(self::TABLE);
 	}
 
 	
