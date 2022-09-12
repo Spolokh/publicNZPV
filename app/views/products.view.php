@@ -1,4 +1,4 @@
-      <div class="d-flex align-items-center my-3">
+			<div class="d-flex align-items-center my-3">
 				<h3 class="mb-1 lh-2"><?=$title ?></h3>
 			</div>
 
