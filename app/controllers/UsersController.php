@@ -19,9 +19,9 @@ class usersController extends Controller
 
 	public function index()
 	{
-		$this->view->render(self::MODULE, self::LAYOUT, [
+		echo $this->view->render(self::MODULE, self::LAYOUT, [
 			'title' => self::TITLE,
-			'query' => $this->model->query(),
+			'count' => $this->model->count(),
 			'login' => $this->model->isAuthorize
 		]);
 	}
@@ -34,13 +34,12 @@ class usersController extends Controller
 	public function user()
 	{
 		$this->user = $_GET['user'] ?? null;
-
 		if (!isset($this->user))
 		{
 			return;
 		}
 
-		$this->view->render('user.view.php', self::LAYOUT, [
+		echo $this->view->render('user.view.php', self::LAYOUT, [
 			'title' => self::TITLE,
 			'query' => $this->model->user()->findOne($this->user),
 			'login' => $this->model->isAuthorize
