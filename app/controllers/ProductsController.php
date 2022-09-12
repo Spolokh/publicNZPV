@@ -8,7 +8,7 @@ class ProductsController extends Controller
 
 	public function __construct()
 	{
-		$this->view  = new View(VIEWS_PATH, Config::parse());
+		$this->view  = new View;
 		$this->model = new ProductsModel;
 	}
 
@@ -16,7 +16,7 @@ class ProductsController extends Controller
 	{
 		$this->view->render(self::MODULE, self::LAYOUT, [
 			'title' => self::TITLE,
-			'query' => $this->model->query(),
+			'count' => $this->model->count(),
 			'login' => $this->model->isLogin
 		]);
 	}
