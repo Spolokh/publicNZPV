@@ -14,7 +14,7 @@ class ProductsController extends Controller
 
 	public function index()
 	{
-		$this->view->render(self::MODULE, self::LAYOUT, [
+		echo $this->view->render(self::MODULE, self::LAYOUT, [
 			'title' => self::TITLE,
 			'count' => $this->model->count(),
 			'login' => $this->model->isLogin
