@@ -9,7 +9,7 @@ class ProductsModel extends Model
 		parent:: __construct();
 	}
 	
-	public function query() // Здесь реальные данные.
+	public function count() // Здесь реальные данные.
 	{
 		return ORM::forTable(self::TABLE)
 			->select(['id'])
