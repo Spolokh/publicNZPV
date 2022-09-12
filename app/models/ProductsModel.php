@@ -14,7 +14,7 @@ class ProductsModel extends Model
 		return ORM::forTable(self::TABLE)
 			->select(['id'])
 			->count()
-        ;
+        	;
 	}
 	
 	public function show(Request $request, $data = [], $query = null) 
