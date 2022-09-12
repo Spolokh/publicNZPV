@@ -1,6 +1,4 @@
-<?php 
-//use Pagination;
-?>
+
 			<div class="d-flex align-items-center my-3">
 				<h3 class="mb-1 lh-2"><?=$title ?></h3>
 			</div>
@@ -17,7 +15,7 @@
 				<div class="tab-content">
 					<div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="homeTab">
 			
-					<?php if (empty($query)) : ?>
+					<?php if (empty($count)) : ?>
 						<div class="alert alert-danger alert-dismissible">
 							<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
 							Записей не найдено !
