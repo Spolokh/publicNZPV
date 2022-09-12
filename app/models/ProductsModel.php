@@ -24,13 +24,13 @@ class ProductsModel extends Model
 		$number = $request->Get('length', 10)->toInteger();
 		$search = $_GET['search']['value'];
 
-		$query = ORM::forTable(self::TABLE);
+		$query = ORM::forTable(self::TABLE)
+			->whereRaw('(`mark` LIKE ? OR `model` LIKE ? OR `generation` LIKE ? OR `year` LIKE ? OR `run` LIKE ? OR `color` LIKE ? OR `transmission` LIKE ? OR `body-type` LIKE ? OR `gear-type` LIKE ?)', [
+				$search.'%', $search.'%',  $search.'%', $search.'%', $search.'%', $search.'%', $search.'%', $search.'%', $search.'%'
+			]);
 		$total = $query->count();
 
 		$query = $query
-		      ->whereRaw('(`mark` LIKE ? OR `model` LIKE ? OR `generation` LIKE ? OR `year` LIKE ? OR `color` LIKE ? OR `transmission` LIKE ?)', [
-			  $search.'%', $search.'%',  $search.'%', $search.'%', $search.'%', $search.'%'
-		      ])
 		      ->offset($offset)
 		      ->limit ($number)
 		      ->orderByAsc('id')
