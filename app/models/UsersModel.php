@@ -13,12 +13,9 @@ class UsersModel extends Model
 	
 	public function query() // Здесь реальные данные.
 	{
-		$offset = $_GET['skip'] ?? self::OFFSET;
-
-		return ORM::forTable('users')
-			->limit (self::NUMBER)
-			->offset(self::OFFSET)
-			->orderByAsc('id');
+		return ORM::forTable(self::TABLE)
+			->select(['id'])
+			->count();
 	}
 
 	public function user()
@@ -27,25 +24,26 @@ class UsersModel extends Model
 	}
 
 	
-	public function json( $json = [], $query = null ) 
+	public function json( $json = [] ) 
 	{
 		$draw 	= $_GET['draw'];
 		$offset = $_GET['start'] ?? 0;
 		$number = $_GET['length'] ?? 10;
 		$search = $_GET['search']['value'];
 		
-		$query = ORM::forTable(self::TABLE)->select(['id', 'username', 'mail', 'date', 'avatar']);
+		$query = ORM::forTable(self::TABLE)
+			->select(['id', 'usergroup', 'username', 'name', 'mail', 'date', 'avatar'])
+			->where('deleted', 0)
+		;
 		$total = $query->count();
-
-		if (!empty($search))
-		{
-			$query = $query->whereLike('username', '%'.$search.'%');
-		}
-
 		$query = $query
-			->limit ($number)
+			->whereRaw('(`username` LIKE ? OR `mail` LIKE ?)', [
+				$search.'%', $search.'%'
+			])
 			->offset($offset)
+			->limit ($number)
 			->orderByAsc('id')
+			->findMany()
 		;
 		
 		foreach ($query->findArray() AS $k => $row)
