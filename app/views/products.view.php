@@ -3,7 +3,14 @@
 			</div>
 
 			<div class="my-3 mt-0 p-3 bg-body rounded shadow-sm">
-				<!--table table-striped table-sm list" style="width: 100%"-->
+				<?php if (empty($count)) : ?>
+				<div class="alert alert-danger alert-dismissible">
+					<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+					Записей не найдено !
+				</div>
+				<?php return;
+				endif; 
+				?>
 				<table id="productsTable" class="table table-striped table-sm list" style="width: 100%">
 					<thead>
 						<tr>
