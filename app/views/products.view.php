@@ -16,7 +16,7 @@
 						<tr>
 							<th width="100">Марка</th>
 							<th width="90">Модель</th>
-							<th width="290">generation
+							<th width="290">Поколение</th>
 							<th>Год</th>
 							<th>Run</th>
 							<th width="100">Цвет</th>
