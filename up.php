@@ -18,8 +18,6 @@ ORM::configure([
     'password' => DBPASS
 ]);
 
-$db = ORM::getDb();
-
 $file = simplexml_load_file($file);
 $data = $file->offers->offer;
 $values = [];
@@ -33,6 +31,7 @@ foreach ($data as $row)
 }
 
 try {
+    $db = ORM::getDb();
     $db->query('REPLACE INTO `products` VALUES '.join(', ', $values).';');
     $db->query('DELETE FROM `products` WHERE `id` NOT IN ('.join(', ', $delete).');');
 } catch(\Exception $e) {
