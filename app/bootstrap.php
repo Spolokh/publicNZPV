@@ -35,22 +35,3 @@ ORM::configure([
 ]);
 
 Route::start();
-
-/*
-$db = ORM::getDb();
-$db->exec("CREATE TABLE IF NOT EXISTS users (
-        id int(11) NOT NULL PRIMARY KEY AUTO_INCREMENT,
-        date int(11) DEFAULT '0',
-        username varchar(50) NOT NULL UNIQUE,
-        password varchar(255) NOT NULL,
-        mail varchar(50) NOT NULL UNIQUE
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8;");
-
-$db->exec("CREATE TABLE IF NOT EXISTS books (
-        id int(11) NOT NULL PRIMARY KEY AUTO_INCREMENT,
-        name varchar(255) NOT NULL,
-        mail varchar(50) NOT NULL,
-        phone varchar(255) NOT NULL,
-        image varchar(255) NOT NULL
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8;");
-*/
