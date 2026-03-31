@@ -23,8 +23,7 @@ $data = $file->offers->offer;
 $values = [];
 $delete = [];
 
-foreach ($data as $row) 
-{
+foreach ($data as $row) {
     $row = (array) $row;
     $delete[] = $row['id'];
     $values[] = '("'.join('", "', array_values($row)).'")';
