@@ -35,8 +35,7 @@ class AjaxModel extends Model
 		$this->mailto  = Config::get('admin_mail');
 		$this->charset = Config::get('charset');
 		
-		if ( !isset($this->action) ) //   $this->isAjax() 'not xmlhttprequest'
-		{
+		if ( !isset($this->action) ) {
 			$this->_response_code( 500, 0 );
 		}
 	}
@@ -48,23 +47,19 @@ class AjaxModel extends Model
 			$this->_response_code( 500, 0 );
 		}
 
-		foreach ($_POST as $k => $v)
-		{
+		foreach ($_POST as $k => $v) {
 			$$k = trim(htmlspecialchars($v));
 		}
 
-		if ( !isset($name, $mail, $sessid, $message) )
-		{
+		if ( !isset($name, $mail, $sessid, $message) ) {
 			$this->_response_code( 500, 0 );
 		}
 
-		if (empty($name))
-		{
+		if (empty($name)) {
 			$this->errors[] = 'Введите ваше Имя!';
 		}
 
-		if ( empty($mail) or !filter_var($mail, FILTER_VALIDATE_EMAIL) )
-		{
+		if ( empty($mail) or !filter_var($mail, FILTER_VALIDATE_EMAIL) ) {
 			$this->errors[] = 'Введите вашу почту корректно!';
 		}
 
@@ -73,13 +68,11 @@ class AjaxModel extends Model
 			$this->errors[] = 'Укажите корректный телефон.';
 		}
 
-		if ( empty($message) )
-		{
+		if ( empty($message) ) {
 			$this->errors[] = 'Вы не написали сообщение';
 		}
 
-		if ( reset ($this->errors) )
-		{
+		if ( reset ($this->errors) ) {
 			$this->result = join ( '<br/>', array_values($this->errors) );
 			$this->_response_code( 500, $this->result);
 		}
@@ -109,53 +102,44 @@ class AjaxModel extends Model
 		} catch ( Exception $e ) {
 			parent::logWrite('Ошибка: ' .$e, true);
 		}
-
 		$this->_response_code( 200, 0 );
 	}
 	
 	public function setPhone($id = 0, array $json = [], string $result = '', $jsonUnicode = JSON_UNESCAPED_UNICODE) : string
 	{
-		if ( $this->action != 'addbook' )
-		{
+		if ( $this->action != 'addbook' ) {
 			$this->_response_code( 500, 0 );
 		}
 
 		$this->sessid() or $this->_response_code( 500, 0 );
 
-		foreach ($_POST as $k => $v)
-		{
+		foreach ($_POST as $k => $v) {
 			$$k = trim(htmlspecialchars($v));
 		}
 
-		if (!isset($name, $family, $mail, $phone))
-		{
+		if (!isset($name, $family, $mail, $phone)) {
 			$this->_response_code( 500, 0 );
 		}
 
-		if ( !filter_var($mail, FILTER_VALIDATE_EMAIL) )
-		{ 
+		if ( !filter_var($mail, FILTER_VALIDATE_EMAIL) ) { 
 			$this->errors[] = 'Введите вашу почту корректно!';
 		}
 
-		if ( !preg_match('/^(\s*)?(\+)?([- _():=+]?\d[- _():=+]?){10,14}(\s*)?$/', $phone) )
-        {
+		if ( !preg_match('/^(\s*)?(\+)?([- _():=+]?\d[- _():=+]?){10,14}(\s*)?$/', $phone) ) {
             $this->errors[] = 'Укажите корректный телефон.';
 		}
 		
-		if ( reset($this->errors) )
-		{
+		if ( reset($this->errors) ) {
 			$this->result = join ( "\n", array_values($this->errors) );
 			$this->_response_code( 
 				500, $this->result
 			);
 		}
 
-		if ( $_FILES['icon']['name'] || !$_FILES['icon']['error'] )
-		{
+		if ( $_FILES['icon']['name'] || !$_FILES['icon']['error'] ) {
 			$this->upload = new Upload ($_FILES['icon']);
 
-			if ($this->upload->uploaded)
-			{
+			if ($this->upload->uploaded) {
 				$this->upload->file_new_name_body = uniqid('photo_');
 				$this->upload->file_max_size = 6291456; // 6 x 1024 x 1024
 				$this->upload->image_ratio_crop = true;
@@ -163,8 +147,7 @@ class AjaxModel extends Model
 				$this->upload->allowed   = ['image/jpeg', 'image/jpg', 'image/png']; 
 				$this->upload->process(root.'/img');
 		
-				if ($this->upload->processed)
-				{ 				
+				if ($this->upload->processed) { 				
 					$icon = $this->upload->file_dst_name;		
 				} 
 			}
@@ -201,20 +184,17 @@ class AjaxModel extends Model
 			$$k = trim(htmlspecialchars($v));
 		}
 
-		if ( !isset($username, $password, $mail) or $this->action != 'registration' )
-		{
+		if ( !isset($username, $password, $mail) or $this->action != 'registration' ) {
 			$this->_response_code( 500, 0 );
 		}
 
 		$this->sessid() or $this->_response_code( 500, 0 );
 
-		if( !preg_match('/^[A-Za-z0-9_\-]{3,16}$/i', $username) )
-		{
+		if( !preg_match('/^[A-Za-z0-9_\-]{3,16}$/i', $username) ) {
 			$this->errors[] = 'Введите ваш логин корректно!';
 		}
 
-		if (empty($password) or $password !== $password2)
-		{
+		if (empty($password) or $password !== $password2) {
 			$this->errors[] = 'Веденные ваши пароли не совпaдают!';
 		}
 
@@ -223,23 +203,19 @@ class AjaxModel extends Model
 			$this->errors[] = 'Пароль должен содержать от 6 до 12 символов, быть в разных регистрах!';
 		} 
 
-		if (!filter_var($mail, FILTER_VALIDATE_EMAIL))
-		{ 
+		if (!filter_var($mail, FILTER_VALIDATE_EMAIL)) { 
 			$this->errors[] = 'Введите вашу почту корректно.';
 		}
 
-		if (ORM::forTable('users')->select('mail')->where(['mail' => $mail])->findOne())
-		{
+		if (ORM::forTable('users')->select('mail')->where(['mail' => $mail])->findOne()) {
 			$this->errors[] = 'Ваш email уже кто-то использует!';
 		}
 
-		if (ORM::forTable('users')->select('username')->where(['username' => $username])->findOne())
-		{
+		if (ORM::forTable('users')->select('username')->where(['username' => $username])->findOne()) {
 			$this->errors[] = 'Ваш логин уже кто-то использует!';
 		}
 
-		if ( reset($this->errors) )
-		{
+		if ( reset($this->errors) ) {
 			$this->result = join ("\n", array_values($this->errors));
 			$this->_response_code(500, $this->result);
 		}
